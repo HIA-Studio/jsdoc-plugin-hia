@@ -1,0 +1,16 @@
+{
+  "name": "jsdoc-plugin-hia",
+  "version": "1.0.0",
+  "description": "jsdoc plugin, contain some annotations and features, such as @coderef(import a codeblock into doc)（一个jsdoc插件，包含一些标识符和特性，如@CodeRef（将代码块导入文档））",
+  "main": "jsdoc-plugin-hia.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mandolin<mandolin.mdy@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "docdash": "^1.0.0",
+    "jsdoc": "^3.5.5"
+  },
+  "dependencies": {}
+}

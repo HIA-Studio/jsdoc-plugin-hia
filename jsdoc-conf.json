@@ -1,0 +1,64 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    "source": {
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_|(^|\\/|\\\\)node_modules|(^|\\/|\\\\)dist"
+    },
+    "plugins": [
+        "plugins/markdown",
+        "jsdoc-plugin-hia"
+    ],
+    "markdown": {
+        "hardwrap": true,
+        "idInHeadings":true,
+        "tags": ["file","overview","property","todo"]
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "opts": {
+        "template"   : "node_modules/docdash",
+        "encoding"   : "utf8"                          ,
+        "destination": "./doc/jsdoc/"                  ,
+        "recurse"    : true                            ,
+        "//tutorials": "path/to/tutorials"             ,
+        "access "    :"all"                            ,
+        "private"    :true                             ,
+
+
+        "docdash": {
+            "static": true,
+            "sort":  false,
+            "sectionOrder": [
+                "Classes",
+                "Modules",
+                "Externals",
+                "Events",
+                "Namespaces",
+                "Mixins",
+                "Tutorials",
+                "Interfaces"
+            ],
+            "openGraph": {
+                "title": "",
+                "type": "website",
+                "image": "",
+                "site_name": "",
+                "url": ""
+            },
+            "meta": {
+                "title": "",
+                "description": "",
+                "keyword": ""
+            },
+            "search": true,
+            "collapse": false,
+            "typedefs": true
+        }
+
+    }
+}
