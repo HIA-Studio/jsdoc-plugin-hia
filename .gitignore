@@ -64,3 +64,4 @@ vmd.webinfo
 
 # vscode workspace file
 *.code-workspace
+doc/jsdoc
