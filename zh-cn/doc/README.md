@@ -46,7 +46,7 @@ var Book = function (title, author) {
     npm i -D docdash-hia
     npm i -D jsdoc-plugin-hia
     ```
-1. 在你的jsdoc配置文件中（假设是jsdco-conf.jsdon）作好相关配置
+1. 在你的jsdoc配置文件中（假设是jsdoc-conf.json）作好相关配置
     ```json
     "plugins": [
         "plugins/markdown",

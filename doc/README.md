@@ -46,7 +46,7 @@ If that is all your need, then JSDoc itself has achieved your goal. But in many 
     npm i -D docdash-hia
     npm i -D jsdoc-plugin-hia
     ```
-1. Make relevant configuration in your JSDoc configuration file (assuming jsdco-conf.jsdon)
+1. Make relevant configuration in your JSDoc configuration file (assuming jsdoc-conf.json)
     ```json
     "plugins": [
         "plugins/markdown",
