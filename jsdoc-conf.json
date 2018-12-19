@@ -9,7 +9,7 @@
     },
     "plugins": [
         "plugins/markdown",
-        "jsdoc-plugin-hia"
+        "./jsdoc-plugin-hia"
     ],
     "markdown": {
         "hardwrap": true,
@@ -21,15 +21,16 @@
         "monospaceLinks": false
     },
     "opts": {
-        "template"   : "node_modules/docdash",
-        "encoding"   : "utf8"                          ,
-        "destination": "./doc/jsdoc/"                  ,
-        "recurse"    : true                            ,
-        "//tutorials": "path/to/tutorials"             ,
-        "access "    :"all"                            ,
-        "private"    :true                             ,
+        "template"    : "./node_modules/docdash-hia",
+        "encoding"    : "utf8"                      ,
+        "destination" : "./api/"                    ,
+        "recurse"     : true                        ,
+        "//tutorials"   : "./doc/"                    ,
+        "readme"   : "./README.md"                  ,
+        "access "     : "all"                       ,
+        "private"     : true                        ,
 
-
+        "@todo ":"调整一些设定项比如站点相关设置等",
         "docdash": {
             "static": true,
             "sort":  false,
@@ -44,16 +45,16 @@
                 "Interfaces"
             ],
             "openGraph": {
-                "title": "",
+                "title": "jsdoc-plugin-hia",
                 "type": "website",
                 "image": "",
-                "site_name": "",
+                "site_name": "jsdoc-plugin-hia",
                 "url": ""
             },
             "meta": {
-                "title": "",
-                "description": "",
-                "keyword": ""
+                "title": "jsdoc-plugin-hia",
+                "description": "jsdoc-plugin-hia",
+                "keyword": "jsdoc-plugin-hia"
             },
             "search": true,
             "collapse": false,

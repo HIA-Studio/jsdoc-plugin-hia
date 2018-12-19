@@ -34,13 +34,14 @@ The following example is to show how to use @coderef. Check the corresponding di
  */
 
 var fs   = require('fs'  );
-var util = require('util');
 
-var templateHelper = require('jsdoc/util/templateHelper');
-var jsdocPath      = require('jsdoc/path'               );
-var dictionary     = require('jsdoc/tag/dictionary'     );
+var jsdocPath = require('jsdoc/path');
 
-var hasOwnProp = Object.prototype.hasOwnProperty;
+var vars    = require('./vars'        );
+var coderef = require('./tag/coderef' );
+
+var EnumFormats      = vars.EnumFormats         ;
+var TransformCoderef = coderef.TransformCoderef ;
 
 /**@codeblock 2018-11-19 22:38:59*/
 //Define global store, convenient late unified handling(定义全局存储器，方便后期统一处理)
@@ -61,152 +62,8 @@ var gjc  = global.jsdoc.codeblocks;
 var gjcu = global.jsdoc.codeurls  ;
 var gjs  = global.jsdoc.sources   ;
 
-//格式枚举
-var EnumFormats = {
-    txt: 0,
-    htm: 1
-};
-
 var files = {};
 /**@codeblockend 2018-11-19 22:38:59*/
-
-/**
- * @desc makeUniqueFilename
-    NOTE: Because templateHelper.createLink cannot be invoked directly (which will cause naming confusion), there is no better solution for now, so the *makeUniqueFilename*, *getUniqueFilename*, *createLink* are extracted directly from JSDoc and modified slightly.
-    (因为不能直接调用templateHelper.createLink(这将造成命名混淆),暂时没有更好的解决方案，因此*makeUniqueFilename*、*getUniqueFilename*、*createLink*都是直接从jsdoc中摘出后稍作修改。)
- *
- * @inner makeUniqueFilename
- * @param {string} filename
- * @param {string} str
- * @returns {string} filename
- */
-var makeUniqueFilename = function (filename, str) {
-    var key = filename.toLowerCase();
-    var nonUnique = true;
-
-    // don't allow filenames to begin with an underscore
-    if (!filename.length || filename[0] === '_') {
-        filename = '-' + filename;
-        key = filename.toLowerCase();
-    }
-
-    // append enough underscores to make the filename unique
-    while (nonUnique) {
-        if (hasOwnProp.call(files, key)) {
-            filename += '_';
-            key = filename.toLowerCase();
-        } else {
-            nonUnique = false;
-        }
-    }
-
-    files[key] = str;
-
-    return filename;
-}
-/**
- *
- *
- * @param {string} str
- * @returns {string} unique filename
- */
-var getUniqueFilename = function (str) {
-    var namespaces = dictionary.getNamespaces().join('|');
-    var basename = (str || '')
-        // use - instead of : in namespace prefixes
-        .replace(new RegExp('^(' + namespaces + '):'), '$1-')
-        // replace characters that can cause problems on some filesystems
-        .replace(/[\\/?*:|'"<>]/g, '_')
-        // use - instead of ~ to denote 'inner'
-        .replace(/~/g, '-')
-        // use _ instead of # to denote 'instance'
-        .replace(/#/g, '_')
-        // use _ instead of / (for example, in module names)
-        .replace(/\//g, '_')
-        // remove the variation, if any
-        .replace(/\([\s\S]*\)$/, '')
-        // make sure we don't create hidden files, or files whose names start with a dash
-        .replace(/^[.-]/, '');
-
-    // in case we've now stripped the entire basename (uncommon, but possible):
-    basename = basename.length ? basename : '_';
-
-    return makeUniqueFilename(basename, str) + templateHelper.fileExtension;
-};
-/**
- *
- *
- * @param {object} doclet
- * @returns {string} fileUrl
- */
-var createLink = function (doclet) {
-    var longname = doclet.longname;
-
-    var filename = getUniqueFilename(longname);
-
-    var fileUrl = encodeURI(filename);
-
-    return fileUrl;
-};
-
-/**
- * @desc TransformCoderef
- * @function TransformCoderef
- * @param   {string} txt        - 待转换的原始文本
- * @param   {enum  } enumFormat - 格式参数
- * @returns {string}              The converted text(转换后的文本)
- */
-var TransformCoderef = function (txt, enumFormat) {
-    var code_links = '';
-    var i = 0;
-
-    //查找所有的@ coderef 并替换为相应代码文本
-    var newtxt = txt.replace(/(@coderef\s[^\n\r\<]*)+/g, function ($) {
-        var codeblock_key = $.replace('@coderef', '').trim();
-        var codeblock     = gjc[codeblock_key];
-
-        var linkpath = codeblock.filepath.replace(global.jsdoc.commonPrefix, '').replace(/\\/g, '/');
-
-        //定义一个临时的doclet方便传参
-        var temp_doclet = {
-            longname: linkpath,
-            memberof: null,
-            kind: 'class'
-        };
-        var codeurl;
-
-        if (gjcu[linkpath]) {
-            codeurl = gjcu[linkpath];//如果已经缓存过，则直接从缓存取
-        } else {
-            codeurl = gjcu[linkpath] = createLink(temp_doclet);
-            templateHelper.registerLink(linkpath, codeurl);
-        }
-
-        var codefilelink = util.format('<a href="%s"%s>%s</a>', encodeURI(codeurl), ' class="codefilelink"', codeblock.filename);
-        var codelinelink = util.format('<a href="%s"%s>%s</a>', encodeURI(codeurl + '#line' + codeblock.lineno), ' class="codelinelink"', `line ${codeblock.lineno}`);
-        var code = codeblock.code;
-        var code_link = `${codefilelink},${codelinelink}`;
-        if (enumFormat === EnumFormats.txt) {
-            code_links += (i ? '<br>' : '') + code_link;
-        }
-        var codetxt = enumFormat === EnumFormats.htm ? `<br>${code_link}<pre class="prettyprint source"><code>${code}</code></pre>` : `//${codeurl}, line ${codeblock.lineno}\n${code}`;
-
-        i++;
-
-        return codetxt;
-    });
-
-    //分隔符
-    var separator = '\n';
-    if (newtxt.startsWith('<caption>')) {
-        separator = '<br>';
-    }
-    if (enumFormat === EnumFormats.txt) {
-        code_links = '<caption>' + code_links + '</caption>' + separator;
-    }
-
-    return code_links + newtxt;
-};
 
 /**@codeblock 2018-11-16 23:16:16 */
 /**
@@ -219,10 +76,14 @@ var TransformCoderef = function (txt, enumFormat) {
  */
 exports.defineTags = function (dictionary) {
     dictionary.defineTag('codeblock', {
-        //@note The corresponding @coderef tag must have an exclusive line and cannot contain <i>&lt;</i> symbols nor characters requiring regular escape.
-        //@note 对应的@coderef标记必须独占一行，并且不能包含<符号,不能包含需要正则转义的字符。
-        //@note Recommended use of @coderef Tags: standard naming (alphanumeric combination) and timestamp.
-        //@note @coderef标记推荐使用：标准命名（字母数字组合）、时间戳
+        //@note Identity names of codeblock cannot contain < symbols nor characters requiring regular escape.
+        //@note 标识名称不能包含<符号,也不能包含需要正则转义的字符。
+        //@note The corresponding @coderef tag must have an exclusive line, if not in the first line it need to lead with //, when used in @example.
+        //@note 对应的@coderef标记在@example中使用时，必须独占一行，如果不在第一行则需要前置//。
+        //@note The corresponding @coderef tag can only appear at the tail or have an exclusive line, when used in @desc or @property.
+        //@note 对应的@coderef标记在@desc或@property中使用时，只能出现在行尾或者独占一行
+        //@note Recommended use of @codeblock identity name: standard naming (alphanumeric combination) and timestamp.
+        //@note @codeblock标识名称推荐使用：标准命名（字母数字组合）、时间戳
         onTagged: (doclet, tag) => {
             var codeblock = {};
             //获取文件名、路径、行号
@@ -278,13 +139,13 @@ exports.handlers = {
         e.doclets.forEach((doclet) => {
             //遍历文档块，如果包含@desc、@example、@property，则将其中的@coderef替换为相应的代码文本
             if (doclet.description) {
-                doclet.description = TransformCoderef(doclet.description, EnumFormats.htm);
+                doclet.description = TransformCoderef(doclet.description, EnumFormats.htm, global.jsdoc, files);
             }
             if (doclet.properties) {
 
                 doclet.properties.forEach((property) => {
                     if (property.description) {
-                        property.description = TransformCoderef(property.description, EnumFormats.htm)
+                        property.description = TransformCoderef(property.description, EnumFormats.htm, global.jsdoc, files)
                     }
                 })
             }
@@ -293,7 +154,7 @@ exports.handlers = {
                 var l = des.length;
 
                 for (let i = 0; i < l; i++) {
-                    des[i] = TransformCoderef(des[i], EnumFormats.txt);
+                    des[i] = TransformCoderef(des[i], EnumFormats.txt, global.jsdoc, files);
                 }
             }
         });
