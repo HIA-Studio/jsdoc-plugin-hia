@@ -15,9 +15,7 @@ layout: page
 Ref the specified existing code block by identity name
 
 ### Sytax
-```bash
-@codref <blockName>
-```
+    @coderef <blockName>
 
 ### Overview
 Import the code block wrapped by the corresponding @codeblock into the current @coderef location in the document comment

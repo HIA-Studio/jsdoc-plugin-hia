@@ -15,9 +15,7 @@ layout: page
 通过标识名称引入指定代码
 
 ### 语法
-```
-@codref <blockName>
-```
+    @coderef <blockName>
 
 ### 概述
 将对应的 @codeblock 所包裹的代码块导入文档注释中当前 @coderef 所处的位置
